@@ -15,11 +15,9 @@ This repository contains a Python-based tool to parse DBC formatted CAN log file
 
 ## Requirements
 
-All required packages are listed in the `requirements.txt` file.
+This project uses [uv](https://docs.astral.sh/uv/) for dependencies management. Follow [uv installation instructions](https://docs.astral.sh/uv/#getting-started) and then run `uv sync` to install the required dependencies inside a python virtual enviroment, make sure to activate the enviroment with `.venv\scripts\Activate` before trying to use the tool or start developing.
 
-- Python 3.6 or higher
-- cantools
-- matplotlib
+All required packages are listed in the `pyproject.toml` file.
 
 ## Installation
 
@@ -33,7 +31,7 @@ All required packages are listed in the `requirements.txt` file.
 2. Install the required dependencies:
 
     ```bash
-    pip install -r requirements.txt
+    uv sync
     ```
 
 ## Usage
