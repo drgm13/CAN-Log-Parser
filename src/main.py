@@ -25,18 +25,19 @@
  */
 """
 
-import cantools
-import os
-import sys
-import matplotlib.pyplot as plt
 import argparse
+import os
+
+import cantools
+import matplotlib.pyplot as plt
 
 from utils import validate_file
+
 
 def parse_dbc(file_path):
     """
     @brief Parse the DBC file to get CAN message definitions.
-    
+
     @param file_path Path to the DBC file.
     @return Parsed DBC database object.
     """
@@ -48,17 +49,18 @@ def parse_dbc(file_path):
         print(f"Error parsing {file_path}: {e}")
         return None
 
+
 def parse_log(db, log_file_path):
     """
     @brief Parse the log file to extract CAN messages.
-    
+
     @param db Parsed DBC database object.
     @param log_file_path Path to the log file.
     @return List of parsed CAN messages.
     """
     try:
         parsed_data = []
-        with open(log_file_path, 'r') as log_file:
+        with open(log_file_path, "r") as log_file:
             current_message = None
             for line in log_file:
                 # print(f"Reading line: {line.strip()}")  # Debug print
@@ -79,10 +81,11 @@ def parse_log(db, log_file_path):
         print(f"Error parsing log file {log_file_path}: {e}")
         return None
 
+
 def process_message(db, message_lines, parsed_data):
     """
     @brief Process a single CAN message from the log file.
-    
+
     @param db Parsed DBC database object.
     @param message_lines List of lines representing a single CAN message.
     @param parsed_data List to append the parsed message data.
@@ -92,7 +95,7 @@ def process_message(db, message_lines, parsed_data):
         main_line = message_lines[0].split()
         # print(f"Main line parts: {main_line}")  # Debug print
         can_id = main_line[2]
-        ecu_name, message_name = main_line[6].split('.')
+        ecu_name, message_name = main_line[6].split(".")
         timestamp = main_line[7]
         direction = main_line[8]
 
@@ -105,34 +108,38 @@ def process_message(db, message_lines, parsed_data):
             signal_value = parts[2]
             signals.append((signal_name, signal_value, timestamp))
 
-        parsed_data.append({
-            "message_name": message_name,
-            "can_id": can_id,
-            "timestamp": timestamp,
-            "direction": direction,
-            "signals": signals
-        })
-            
+        parsed_data.append(
+            {
+                "message_name": message_name,
+                "can_id": can_id,
+                "timestamp": timestamp,
+                "direction": direction,
+                "signals": signals,
+            }
+        )
+
     except Exception as e:
         print(f"Error processing message: {e}, for CAN ID: {can_id}")
         return
 
+
 def print_parsed_data(parsed_data):
     """
     @brief Print parsed data for debugging purposes.
-    
+
     @param parsed_data List of parsed CAN messages.
     """
     for data in parsed_data:
-        #print(f"Message: {data['message_name']}, CAN ID: {data['can_id']}, Timestamp: {data['timestamp']}, Direction: {data['direction']}")
-        for signal in data['signals']:
+        # print(f"Message: {data['message_name']}, CAN ID: {data['can_id']}, Timestamp: {data['timestamp']}, Direction: {data['direction']}")
+        for signal in data["signals"]:
             signal_name, signal_value, signal_timestamp = signal
-            #print(f"  Signal: {signal_name}, Value: {signal_value}, Timestamp: {signal_timestamp}")
+            # print(f"  Signal: {signal_name}, Value: {signal_value}, Timestamp: {signal_timestamp}")
+
 
 def plot_signals(parsed_data, signal_name, start_time, end_time):
     """
     @brief Plot the signal data over time.
-    
+
     @param parsed_data List of parsed CAN messages.
     @param signal_name Name of the signal to plot.
     @param start_time Start time for the plot.
@@ -141,7 +148,7 @@ def plot_signals(parsed_data, signal_name, start_time, end_time):
     timestamps = []
     values = []
     for data in parsed_data:
-        for signal in data['signals']:
+        for signal in data["signals"]:
             s_name, s_value, s_timestamp = signal
             try:
                 s_value = float(s_value)
@@ -150,7 +157,11 @@ def plot_signals(parsed_data, signal_name, start_time, end_time):
                 print(f"Error converting value: {e}")
                 continue
 
-            if s_name == signal_name and (start_time is None or s_timestamp >= start_time) and (end_time is None or s_timestamp <= end_time):
+            if (
+                s_name == signal_name
+                and (start_time is None or s_timestamp >= start_time)
+                and (end_time is None or s_timestamp <= end_time)
+            ):
                 timestamps.append(s_timestamp)
                 values.append(s_value)
 
@@ -160,25 +171,30 @@ def plot_signals(parsed_data, signal_name, start_time, end_time):
 
     plt.figure(figsize=(15, 5))  # Adjust the size as needed
     plt.plot(timestamps, values)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Value')
-    plt.title(f'Signal: {signal_name}')
+    plt.xlabel("Time (s)")
+    plt.ylabel("Value")
+    plt.title(f"Signal: {signal_name}")
     plt.grid(True)
 
     # Format the x-axis to display timestamps correctly in seconds
-    plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.2f}'))
+    plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f"{x:.2f}"))
 
     plt.tight_layout()
     plt.show()
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot CAN signal data")
-    #parser.add_argument('mode', choices=['test', 'main'], help="Mode to run the script in")     # TODO: Not used for anything rn, see if can remove
-    parser.add_argument('log', type=str, help="Path to CAN log file")
-    parser.add_argument('dbc', type=str, help="Path to DBC file")
-    parser.add_argument('signal', type=str, help="Signal name to plot")
-    parser.add_argument('start', type=float, nargs='?', default=None, help="Start time for the plot")
-    parser.add_argument('end', type=float, nargs='?', default=None, help="End time for the plot")
+    # parser.add_argument('mode', choices=['test', 'main'], help="Mode to run the script in")     # TODO: Not used for anything rn, see if can remove
+    parser.add_argument("log", type=str, help="Path to CAN log file")
+    parser.add_argument("dbc", type=str, help="Path to DBC file")
+    parser.add_argument("signal", type=str, help="Signal name to plot")
+    parser.add_argument(
+        "start", type=float, nargs="?", default=None, help="Start time for the plot"
+    )
+    parser.add_argument(
+        "end", type=float, nargs="?", default=None, help="End time for the plot"
+    )
 
     args = parser.parse_args()
 
