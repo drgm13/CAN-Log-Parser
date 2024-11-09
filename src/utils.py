@@ -11,8 +11,6 @@ def validate_file(file_path, description):
     @return Absolute path of the file if valid, else exits the program
     """
     if not os.path.isfile(file_path):
-        print(
-            f"Error: The {description} '{file_path}' does not exist or is not a file."
-        )
+        print(f"Error: The {description} '{file_path}' does not exist or is not a file.")
         sys.exit(1)
     return os.path.abspath(file_path)

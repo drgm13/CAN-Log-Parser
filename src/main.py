@@ -189,12 +189,8 @@ if __name__ == "__main__":
     parser.add_argument("log", type=str, help="Path to CAN log file")
     parser.add_argument("dbc", type=str, help="Path to DBC file")
     parser.add_argument("signal", type=str, help="Signal name to plot")
-    parser.add_argument(
-        "start", type=float, nargs="?", default=None, help="Start time for the plot"
-    )
-    parser.add_argument(
-        "end", type=float, nargs="?", default=None, help="End time for the plot"
-    )
+    parser.add_argument("start", type=float, nargs="?", default=None, help="Start time for the plot")
+    parser.add_argument("end", type=float, nargs="?", default=None, help="End time for the plot")
 
     args = parser.parse_args()
 
@@ -211,7 +207,7 @@ if __name__ == "__main__":
         if parsed_data:
             # Determine start and end times for the plot if not provided
             if args.start is None or args.end is None:
-                all_timestamps = [float(data['timestamp']) / 1000 for data in parsed_data for signal in data['signals']]
+                all_timestamps = [float(data["timestamp"]) / 1000 for data in parsed_data for signal in data["signals"]]
                 start_time = min(all_timestamps) if args.start is None else args.start
                 end_time = max(all_timestamps) if args.end is None else args.end
             else:
